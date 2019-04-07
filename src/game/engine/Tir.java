@@ -33,7 +33,7 @@ public class Tir implements Animatable {
                     AffineTransformOp.TYPE_BILINEAR);
             bufferedImage = op.filter(bufferedImage, null);
         } catch (IOException ex) {
-            ex.printStackTrace();
+
         }
     }
 
