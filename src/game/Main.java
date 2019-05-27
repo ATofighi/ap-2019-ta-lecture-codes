@@ -10,6 +10,7 @@ public class Main {
         mainFrame.add(mainPanel);
 
         mainFrame.setVisible(true);
+        mainPanel.requestFocus();
 
         new PaintLoop(mainPanel).start();
     }

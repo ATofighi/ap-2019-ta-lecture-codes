@@ -2,90 +2,53 @@ package xo;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.net.Socket;
+import java.util.Scanner;
 
 public class MainPanel extends JPanel {
     private String currentTurn = "X";
+    private String winner = "";
     private GameButton[][] buttons = new GameButton[3][3];
+    private Scanner scanner;
+    private PrintStream printer;
 
-    public MainPanel() {
+    public MainPanel(Scanner scanner, PrintStream printer) {
+        this.scanner = scanner;
+        this.printer = printer;
         setLayout(new GridLayout(3, 3));
-//        for (int i = 0; i < 3; i++) {
-//            for (int j = 0; j < 3; j++) {
-//                buttons[i][j] = new GameButton(this);
-//                add(buttons[i][j]);
-//            }
-//        }
-        JButton j = new JButton("");
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                buttons[i][j] = new GameButton(this, i, j, printer);
+                add(buttons[i][j]);
+            }
+        }
     }
 
-    String getWinner() {
+
+
+    public void load() {
+        boolean oldFinish = isFinished();
+        currentTurn = scanner.next();
+        winner = scanner.next();
+        if(winner.equals("-")) winner = "";
         for (int i = 0; i < 3; i++) {
-            String s = buttons[i][0].getText();
-            boolean ok = !s.equals("");
             for (int j = 0; j < 3; j++) {
-                if (!s.equals(buttons[i][j].getText())) {
-                    ok = false;
-                }
-            }
-            if (ok) {
-                return s;
+                buttons[i][j].setText(scanner.next());
             }
         }
 
-
-        for (int i = 0; i < 3; i++) {
-            String s = buttons[0][i].getText();
-            boolean ok = !s.equals("");
-            for (int j = 0; j < 3; j++) {
-                if (!s.equals(buttons[j][i].getText())) {
-                    ok = false;
-                }
-            }
-            if (ok) {
-                return s;
-            }
+        if (isFinished() && !oldFinish) {
+            JOptionPane.showMessageDialog(this, getWinner() + " wins!");
         }
-        {
-            String s = buttons[0][0].getText();
-            boolean ok = !s.equals("");
-            for (int j = 0; j < 3; j++) {
-                if (!s.equals(buttons[j][j].getText())) {
-                    ok = false;
-                }
-            }
-            if (ok) {
-                return s;
-            }
-        }
-
-        {
-            String s = buttons[0][2].getText();
-            boolean ok = !s.equals("");
-            for (int j = 0; j < 3; j++) {
-                if (!s.equals(buttons[j][2 - j])) {
-                    ok = false;
-                }
-            }
-            if (ok) {
-                return s;
-            }
-        }
-        return null;
     }
 
     public boolean isFinished() {
-        return getWinner() != null;
+        return !winner.equals("");
     }
 
-    public String getAndNextTurn() {
-        String nextTurn = "X";
-        if (currentTurn.equals("X")) {
-            nextTurn = "O";
-        }
-
-        String temp = currentTurn;
-        currentTurn = nextTurn;
-
-        return temp;
+    public String getWinner() {
+        return winner;
     }
 }

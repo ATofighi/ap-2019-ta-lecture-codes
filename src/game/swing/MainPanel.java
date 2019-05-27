@@ -1,16 +1,18 @@
 package game.swing;
 
+import game.FileClassLoader;
 import game.engine.Game;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
+import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 
 public class MainPanel extends JPanel {
 
@@ -27,10 +29,28 @@ public class MainPanel extends JPanel {
         }
         game = new Game(800, 600);
 
+        addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_O && e.isControlDown()) {
+                    JFileChooser jFileChooser = new JFileChooser();
+                    if (jFileChooser.showOpenDialog(MainPanel.this) == JFileChooser.APPROVE_OPTION) {
+                        File file = jFileChooser.getSelectedFile();
+                        FileClassLoader fcl = new FileClassLoader(getClass().getClassLoader());
+                        String className = file.getName();
+                        className = className.substring(0, className.length() - ".class".length());
+                        game.addChicken(fcl.loadClass(className, file));
+                    }
+                }
+            }
+        });
+
+
         addMouseMotionListener(new MouseMotionListener() {
             @Override
             public void mouseDragged(MouseEvent e) {
-
+                game.getRocket().setX(e.getX());
+                game.getRocket().setY(e.getY());
             }
 
             @Override
@@ -66,6 +86,8 @@ public class MainPanel extends JPanel {
 
             }
         });
+
+        setFocusable(true);
     }
 
     @Override
